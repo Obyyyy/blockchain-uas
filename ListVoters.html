@@ -77,14 +77,18 @@
             <div class="card card-custom">
                 <div class="card-body">
                     <h5 class="card-title text-center">Tambah Kandidat</h5>
-                    <form method="POST" action="/vote" enctype="multipart/form-data">
+                    <!-- <form method="POST" action="/addCandidate" enctype="multipart/form-data">
                         <div class="form-group">
-                            <input type="text" class="form-control form-control-custom" name="vote" placeholder="Tambahkan nama kandidat ... " />
+                            <input type="text" class="form-control form-control-custom" name="vote" placeholder="Tambahkan nama kandidat ... " required id="candidateName" />
                         </div>
                         <div class="text-center">
                             <input type="submit" class="btn btn-custom" value="Add Candidate" />
                         </div>
-                    </form>
+                    </form> -->
+                    <input type="text" class="form-control form-control-custom" id="candidateName" placeholder="Tambahkan nama kandidat ..." required />
+                    <div class="text-center">
+                        <button type="button" onclick="addCandidate()" class="btn btn-custom">Tambah</button>
+                    </div>
                     <p id="votingStatus" class="text-center mt-3"></p>
                 </div>
             </div>

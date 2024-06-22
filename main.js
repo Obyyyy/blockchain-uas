@@ -1,8 +1,8 @@
 // require("dotenv").config();
 
 let WALLET_CONNECTED = "";
-// let contractAddress = "0x1ccB0A73939F3d224f3a7e5EdB85415dF90b04E8";
-let contractAddress = "0x2F012Efe614512C67b6312E55F1B145d41194249";
+// let contractAddress = "0x2F012Efe614512C67b6312E55F1B145d41194249";
+let contractAddress = "0x4d4dDAB8B1AdAdf010e5DaC69AC012093B7b117a";
 // let contractAddress = process.env.CONTRACT_ADDRESS;
 let contractAbi = [
     {
@@ -226,8 +226,14 @@ const voteStatus = async () => {
         const currentStatus = await contractInstance.getVotingStatus();
         const time = await contractInstance.getRemainingTime();
         console.log(time);
-        status.innerHTML = currentStatus == 1 ? "Voting is currently open" : "Voting is finished";
-        remainingTime.innerHTML = `Remaining time is ${parseInt(time, 16)} seconds`;
+        status.innerHTML = currentStatus == 1 ? "Waktu voting masih terbuka" : "Waktu voting telah selesai";
+
+        const totalSeconds = parseInt(time, 16);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        remainingTime.innerHTML = `Sisa waktu voting adalah ${hours} jam, ${minutes} menit dan ${seconds} detik, ${totalSeconds}`;
     } else {
         var status = document.getElementById("status");
         status.innerHTML = "Hubungkan akun ke metamask terlebih dahulu";
@@ -264,3 +270,20 @@ const getAllCandidates = async () => {
         p3.innerHTML = "Hubungkan akun ke metamask terlebih dahulu";
     }
 };
+
+async function addCandidate() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+    const candidateName = document.getElementById("candidateName").value;
+
+    try {
+        const tx = await contract.addCandidate(candidateName);
+        await tx.wait();
+        alert("Kandidat telah berhasil ditambahkan");
+    } catch (error) {
+        console.error(error);
+        alert("Hanya pemilik kontrak yang bisa menambahkan kandidat");
+    }
+}

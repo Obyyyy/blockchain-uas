@@ -1,158 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>To Do Decentralized Application</title>
-    <script src="main.js"></script>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.1.umd.min.js"
-        type="application/javascript"></script>
-	<title>Voting DAPP</title>
-	<style>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Voting DAPP</title>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="https://cdn.ethers.io/lib/ethers-5.7.1.umd.min.js" type="application/javascript"></script>
+        <link href="styles/style.css" rel="stylesheet" />
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
+            .navbar {
+                margin-bottom: 20px;
+            }
+            .title {
+                text-align: center;
+            }
+            .container {
+                margin-top: 20px;
+            }
+            .btn-custom {
+                background-color: #4caf50;
+                color: white;
+                border: none;
+            }
+            .btn-custom:hover {
+                background-color: #3e8e41;
+            }
+            .card-custom {
+                margin-top: 20px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+                transition: 0.3s;
+            }
+            .card-custom:hover {
+                box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+            }
+            .form-control-custom {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Voting DAPP</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index.html">Vote</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ListVoters.html">List Voters</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
-		button {
-			background-color: #4CAF50;
-			color: white;
-			padding: 12px 24px;
-			border: none;
-			border-radius: 4px;
-			cursor: pointer;
-			font-size: 16px;
-			font-weight: bold;
-			display: block;
-			margin: 50px auto 0;
-		}
+        <div class="container">
+            <h1 class="title m-5">Decentralized Voting Application</h1>
 
-		button:hover {
-			background-color: #3e8e41;
-		}
+            <div class="text-center card">
+                <div class="card-body">
+                    <button class="btn btn-custom mb-3" onclick="connectMetamask()">Hubungkan ke Metamask</button>
+                    <p id="metamasknotification"></p>
+                </div>
+            </div>
 
-		/* Paragraph styles */
-		p {
-			text-align: center;
-			font-size: 20px;
-			margin-top: 50px;
-		}
+            <div class="card card-custom">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Vote Here</h5>
+                    <div class="form-group">
+                        <input type="number" class="form-control form-control-custom" id="vote" placeholder="Add Index of the Voter ... " />
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-custom" onclick="addVote()">Add Vote</button>
+                    </div>
+                    <p id="cand" class="text-center mt-3"></p>
 
+                    <div class="text-center mt-4">
+                        <button class="btn btn-custom" onclick="voteStatus()">Check Voting Status</button>
+                    </div>
+                    <p id="status" class="text-center mt-3"></p>
+                    <p id="time" class="text-center"></p>
+                </div>
+            </div>
+        </div>
 
-		form {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			margin-top: 50px;
-		}
-		
-		input[type=text], select {
-			width: 30%;
-			padding: 12px 20px;
-			margin: 8px 0;
-			box-sizing: border-box;
-			border: 2px solid #ccc;
-			border-radius: 4px;
-		}
-		
-        input[type=number], select {
-			width: 30%;
-			padding: 12px 20px;
-			margin: 8px 0;
-			box-sizing: border-box;
-			border: 2px solid #ccc;
-			border-radius: 4px;
-		}
-
-		input[type=submit] {
-			background-color: #4CAF50;
-			color: white;
-			padding: 12px 20px;
-			border: none;
-			border-radius: 4px;
-			cursor: pointer;
-		}
-		
-		input[type=submit]:hover {
-			background-color: #45a049;
-		}
-		
-		.container {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			margin-top: 50px;
-		}
-		
-		span {
-			display: block;
-			margin-bottom: 10px;
-		}
-
-/* Style the navigation bar */
-		.navbar {
-			overflow: hidden;
-			background-color: #333;
-			font-family: Arial;
-		}
-
-		/* Style the links inside the navigation bar */
-		.navbar a {
-			float: left;
-			display: block;
-			color: white;
-			text-align: center;
-			padding: 14px 20px;
-			text-decoration: none;
-		}
-
-		/* Change the color of links on hover */
-		.navbar a:hover {
-			background-color: #ddd;
-			color: black;
-		}
-
-		
-        #myTable {
-        border-collapse: collapse;
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-        }
-
-        #myTable th,
-        #myTable td {
-        border: 1px solid black;
-        padding: 8px;
-        text-align: center;
-        }
-
-        #myTable th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-        }
-
-	</style>
-
-</head>
-<body>
-    <div class = "navbar">
-        <a href="/index.html">Vote</a>
-        <a href="/ListVoters.html">List Voters</a>
-    </div>
-
-    <div class="container">Welcome to the Decentralized Voting Application</div>
-
-    <div>
-        <button onclick="connectMetamask()">Connect Metamask</button>
-        <p id="metamasknotification"></p>
-    </div>
-
-    <div class="container">
-        <span>Vote here</span>
-        <input type = "number" id ="vote" placeholder="Add Index of the Voter ... ">
-        <button onclick="addVote()">Add Vote</button>
-        <p id="cand"></p>
-        
-        <button onclick="voteStatus()">Check Voting Status</button>
-        <p id = "status"></p>
-        <p id = "time"></p>
-    </div>
-</body>
+        <script src="main.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    </body>
 </html>

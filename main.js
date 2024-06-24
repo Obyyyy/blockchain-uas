@@ -1,8 +1,7 @@
 // require("dotenv").config();
 
 let WALLET_CONNECTED = "";
-// let contractAddress = "0x2F012Efe614512C67b6312E55F1B145d41194249";
-let contractAddress = "0x4d4dDAB8B1AdAdf010e5DaC69AC012093B7b117a";
+let contractAddress = "0x153cbc233B849ffc42a325Faace3A9E20189830b";
 // let contractAddress = process.env.CONTRACT_ADDRESS;
 let contractAbi = [
     {
@@ -199,16 +198,46 @@ const connectMetamask = async () => {
 
 const addVote = async () => {
     if (WALLET_CONNECTED != 0) {
-        var name = document.getElementById("vote");
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
+
         const signer = provider.getSigner();
         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
+
+        const candidateIndexInput = document.getElementById("vote");
+        const candidateIndex = parseInt(candidateIndexInput.value);
+        const totalCandidates = await contractInstance.getAllVotesOfCandiates();
+
         var cand = document.getElementById("cand");
-        cand.innerHTML = "Please wait, adding a vote in the smart contract";
-        const tx = await contractInstance.vote(name.value);
-        await tx.wait();
-        cand.innerHTML = "Vote added !!!";
+        if (isNaN(candidateIndex) || candidateIndex < 0 || candidateIndex >= totalCandidates.length) {
+            cand.innerHTML = "Indeks kandidat tidak valid.";
+            return;
+        }
+
+        cand.innerHTML = "Mohon tunggu, sedang menambahkan vote ke dalam kontrak pintar";
+
+        try {
+            const status = await contractInstance.getVotingStatus();
+            if (!status) {
+                cand.innerHTML = "Waktu voting telah selesai.";
+                return;
+            }
+
+            const tx = await contractInstance.vote(candidateIndex);
+            await tx.wait();
+            cand.innerHTML = "Vote berhasil diberikan !!!";
+        } catch (error) {
+            console.error(error);
+            console.error(error);
+            const errorMessage = error.data.data && error.data.data.reason ? error.data.data.reason : error.message;
+
+            if (errorMessage.includes("You have already voted")) {
+                cand.innerHTML = "Anda sudah memberikan suara.";
+            } else {
+                console.log(error);
+                cand.innerHTML = "Gagal memberikan suara.";
+            }
+        }
     } else {
         var cand = document.getElementById("cand");
         cand.innerHTML = "Hubungkan akun ke metamask terlebih dahulu";
@@ -233,7 +262,7 @@ const voteStatus = async () => {
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
 
-        remainingTime.innerHTML = `Sisa waktu voting adalah ${hours} jam, ${minutes} menit dan ${seconds} detik, ${totalSeconds}`;
+        remainingTime.innerHTML = currentStatus == 1 ? `Sisa waktu voting adalah ${hours} jam, ${minutes} menit dan ${seconds} detik` : "";
     } else {
         var status = document.getElementById("status");
         status.innerHTML = "Hubungkan akun ke metamask terlebih dahulu";
@@ -279,11 +308,26 @@ async function addCandidate() {
     const candidateName = document.getElementById("candidateName").value;
 
     try {
+        if (candidateName == "") {
+            alert("Isi nama kandidat terlebih dahulu");
+            return;
+        }
+
+        const status = await contractInstance.getVotingStatus();
+        if (!status) {
+            alert("Waktu voting telah selesai");
+            return;
+        }
+
         const tx = await contract.addCandidate(candidateName);
         await tx.wait();
         alert("Kandidat telah berhasil ditambahkan");
     } catch (error) {
         console.error(error);
-        alert("Hanya pemilik kontrak yang bisa menambahkan kandidat");
+        if (error.message.includes("user rejected transaction")) {
+            alert("Transaksi dibatalkan");
+        } else {
+            alert("Hanya pemilik kontrak yang bisa menambahkan kandidat");
+        }
     }
 }

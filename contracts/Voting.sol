@@ -43,6 +43,7 @@ contract Voting {
     }
 
     function vote(uint256 _candidateIndex) public {
+        require(getVotingStatus(), "Voting is not active.");
         require(!voters[msg.sender], "You have already voted.");
         require(_candidateIndex < candidates.length, "Invalid candidate index.");
 
@@ -55,8 +56,8 @@ contract Voting {
     }
 
     function getVotingStatus() public view returns (bool) {
-    return (block.timestamp >= votingStart && block.timestamp < votingEnd);
-}
+        return (block.timestamp >= votingStart && block.timestamp < votingEnd);
+    }
 
     function getRemainingTime() public view returns (uint256) {
         require(block.timestamp >= votingStart, "Voting has not started yet.");
@@ -64,5 +65,5 @@ contract Voting {
             return 0;
         }
         return votingEnd - block.timestamp;
-}
+    }
 }

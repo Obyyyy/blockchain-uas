@@ -1,7 +1,7 @@
 // require("dotenv").config();
 
 let WALLET_CONNECTED = "";
-let contractAddress = "0x153cbc233B849ffc42a325Faace3A9E20189830b";
+let contractAddress = "0x3DcE32d72Bf2696Fd1dE080Ad11b5fe4B2ea4A6d";
 // let contractAddress = process.env.CONTRACT_ADDRESS;
 let contractAbi = [
     {
